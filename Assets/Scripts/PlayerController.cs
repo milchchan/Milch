@@ -12,7 +12,7 @@ namespace Milch
         [SerializeField]
         private GameObject model = null;
         [SerializeField]
-        private Camera camera = null;
+        private Camera followCamera = null;
         [SerializeField]
         private float minFieldOfView = 60.0f;
         [SerializeField]
@@ -48,7 +48,7 @@ namespace Milch
         [SerializeField]
         private float maxPitch = 45;
         private Animator animator = null;
-        private Rigidbody rigidbody = null;
+        private Rigidbody rg = null;
         private GameObject characterHips = null;
         private SkinnedMeshRenderer faceSkinnedMeshRenderer = null;
         private bool isGrounded = true;
@@ -109,7 +109,7 @@ namespace Milch
             this.sourceCameraOffsetY = this.targetCameraOffsetY = this.cameraNeutralOffsetY;
             this.sourceCameraOffsetZ = this.targetCameraOffsetZ = this.cameraNeutralOffsetZ;
             this.animator = this.model.GetComponent<Animator>();
-            this.rigidbody = this.model.GetComponent<Rigidbody>();
+            this.rg = this.model.GetComponent<Rigidbody>();
             this.characterHips = this.model.transform.Find(this.modelRootName).Find(this.modelHipsName).gameObject;
             this.faceSkinnedMeshRenderer = this.model.transform.Find(this.modelFaceName).gameObject.GetComponent<SkinnedMeshRenderer>();
             this.model.transform.rotation = Quaternion.Euler(0.0f, 180.0f, 0.0f);
@@ -173,25 +173,25 @@ namespace Milch
                     this.sourceCameraOffsetZ = this.targetCameraOffsetZ;
                 }
 
-                this.camera.transform.position = new Vector3(this.model.transform.position.x, this.model.transform.position.y + this.sourceCameraOffsetY, this.model.transform.position.z + this.sourceCameraOffsetZ);
-                this.camera.transform.RotateAround(this.model.transform.position + Vector3.up * this.sourceCameraOffsetY, Vector3.right, this.sourcePitch);
-                this.camera.transform.RotateAround(this.model.transform.position + Vector3.up * this.sourceCameraOffsetY, Vector3.up, this.sourceYaw);
-                this.camera.transform.LookAt(this.model.transform.position + Vector3.up * this.sourceCameraOffsetY);
+                this.followCamera.transform.position = new Vector3(this.model.transform.position.x, this.model.transform.position.y + this.sourceCameraOffsetY, this.model.transform.position.z + this.sourceCameraOffsetZ);
+                this.followCamera.transform.RotateAround(this.model.transform.position + Vector3.up * this.sourceCameraOffsetY, Vector3.right, this.sourcePitch);
+                this.followCamera.transform.RotateAround(this.model.transform.position + Vector3.up * this.sourceCameraOffsetY, Vector3.up, this.sourceYaw);
+                this.followCamera.transform.LookAt(this.model.transform.position + Vector3.up * this.sourceCameraOffsetY);
             }
 
             if (this.isCloseup)
             {
-                Vector3 cameraForward = Vector3.Scale(this.camera.transform.forward, new Vector3(1, 0, 1)).normalized;
+                Vector3 cameraForward = Vector3.Scale(this.followCamera.transform.forward, new Vector3(1, 0, 1)).normalized;
 
-                moveForward = cameraForward * verticalInput + this.camera.transform.right * horizontalInput;
+                moveForward = cameraForward * verticalInput + this.followCamera.transform.right * horizontalInput;
 
                 this.model.transform.rotation = Quaternion.Slerp(this.model.transform.rotation, Quaternion.LookRotation(cameraForward), Time.fixedDeltaTime * this.transitionSpeed);
             }
             else
             {
-                Vector3 cameraForward = Vector3.Scale(this.camera.transform.forward, new Vector3(1, 0, 1)).normalized;
+                Vector3 cameraForward = Vector3.Scale(this.followCamera.transform.forward, new Vector3(1, 0, 1)).normalized;
 
-                moveForward = cameraForward * verticalInput + this.camera.transform.right * horizontalInput;
+                moveForward = cameraForward * verticalInput + this.followCamera.transform.right * horizontalInput;
 
                 if (moveForward != Vector3.zero)
                 {
@@ -203,7 +203,7 @@ namespace Milch
             {
                 if (Input.GetButton("Jump") && !this.animator.GetBool("IsJumping") && !this.animator.GetCurrentAnimatorStateInfo(0).IsName("Jump"))
                 {
-                    this.rigidbody.AddForce(this.model.transform.up * this.rigidbody.mass * Mathf.Sqrt(2.0f * -Physics.gravity.y * this.jumpHeight), ForceMode.Impulse);
+                    this.rg.AddForce(this.model.transform.up * this.rg.mass * Mathf.Sqrt(2.0f * -Physics.gravity.y * this.jumpHeight), ForceMode.Impulse);
                     this.animator.SetBool("IsJumping", true);
                 }
                 else
@@ -212,33 +212,33 @@ namespace Milch
 
                     if (magnitude > 0.0f)
                     {
-                        this.rigidbody.velocity = moveForward.normalized * this.maxMovementSpeed * magnitude;
+                        this.rg.velocity = moveForward.normalized * this.maxMovementSpeed * magnitude;
                     }
 
                     this.animator.SetFloat("Speed", magnitude);
                 }
             }
 
-            if (this.rigidbody.velocity.magnitude > this.walkingSpeed)
+            if (this.rg.velocity.magnitude > this.walkingSpeed)
             {
-                var to = (Mathf.Min(this.rigidbody.velocity.magnitude, this.maxMovementSpeed) - this.walkingSpeed) / (this.maxMovementSpeed - this.walkingSpeed) * (this.maxFieldOfView - this.minFieldOfView) + this.minFieldOfView;
+                var to = (Mathf.Min(this.rg.velocity.magnitude, this.maxMovementSpeed) - this.walkingSpeed) / (this.maxMovementSpeed - this.walkingSpeed) * (this.maxFieldOfView - this.minFieldOfView) + this.minFieldOfView;
 
-                if (to - this.camera.fieldOfView < float.Epsilon)
+                if (to - this.followCamera.fieldOfView < float.Epsilon)
                 {
-                    this.camera.fieldOfView = this.maxFieldOfView;
+                    this.followCamera.fieldOfView = this.maxFieldOfView;
                 }
                 else
                 {
-                    this.camera.fieldOfView = Mathf.SmoothStep(this.camera.fieldOfView, to, Time.fixedDeltaTime * this.dynamicFieldOfViewSpeed);
+                    this.followCamera.fieldOfView = Mathf.SmoothStep(this.followCamera.fieldOfView, to, Time.fixedDeltaTime * this.dynamicFieldOfViewSpeed);
                 }
             }
-            else if (this.camera.fieldOfView - this.minFieldOfView < float.Epsilon)
+            else if (this.followCamera.fieldOfView - this.minFieldOfView < float.Epsilon)
             {
-                this.camera.fieldOfView = this.minFieldOfView;
+                this.followCamera.fieldOfView = this.minFieldOfView;
             }
             else
             {
-                this.camera.fieldOfView = Mathf.SmoothStep(this.camera.fieldOfView, this.minFieldOfView, Time.fixedDeltaTime * this.dynamicFieldOfViewSpeed);
+                this.followCamera.fieldOfView = Mathf.SmoothStep(this.followCamera.fieldOfView, this.minFieldOfView, Time.fixedDeltaTime * this.dynamicFieldOfViewSpeed);
             }
         }
 
@@ -249,7 +249,7 @@ namespace Milch
 
             for (int i = 0; i < this.eyeTransforms.Length; i++)
             {
-                var quaternion = Quaternion.LookRotation(this.camera.transform.position - this.eyeTransforms[i].position);
+                var quaternion = Quaternion.LookRotation(this.followCamera.transform.position - this.eyeTransforms[i].position);
                 var angleX = quaternion.eulerAngles.x;
                 var angleY = quaternion.eulerAngles.y;
                 var angleZ = quaternion.eulerAngles.z;

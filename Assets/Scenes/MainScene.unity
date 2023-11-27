@@ -886,7 +886,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   model: {fileID: 1124951060}
-  camera: {fileID: 963194227}
+  followCamera: {fileID: 963194227}
   minFieldOfView: 60
   maxFieldOfView: 90
   dynamicFieldOfViewSpeed: 5
