@@ -1154,8 +1154,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de3b20f1acd2343c08c2031ca9d6b488, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetObject: {fileID: 1124951060}
-  basePanelObject: {fileID: 270383477}
+  target: {fileID: 1124951060}
+  compass: {fileID: 270383477}
   transitionSpeed: 50
 --- !u!1 &1762259372
 GameObject:

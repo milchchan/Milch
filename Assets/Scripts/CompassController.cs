@@ -8,9 +8,9 @@ namespace Milch
     public class CompassController : MonoBehaviour
     {
         [SerializeField]
-        private GameObject targetObject = null;
+        private GameObject target = null;
         [SerializeField]
-        private GameObject basePanelObject = null;
+        private GameObject compass = null;
         [SerializeField]
         private float transitionSpeed = 10.0f;
         private RectTransform baseTransform = null;
@@ -21,13 +21,13 @@ namespace Milch
         // Start is called before the first frame update
         void Start()
         {
-            this.baseTransform = this.basePanelObject.GetComponent<RectTransform>();
+            this.baseTransform = this.compass.GetComponent<RectTransform>();
         }
 
         // Update is called once per frame
         void Update()
         {
-            this.targetAngle = this.targetObject.transform.eulerAngles.y;
+            this.targetAngle = this.target.transform.eulerAngles.y;
 
             if (this.sourceAngle != this.targetAngle)
             {
@@ -81,7 +81,7 @@ namespace Milch
                 }
             }
 
-            this.heading = string.Format("{0:0}", this.targetObject.transform.eulerAngles.y);
+            this.heading = string.Format("{0:0}", this.target.transform.eulerAngles.y);
         }
     }
 }
