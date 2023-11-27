@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Milch
 {
@@ -13,7 +12,7 @@ namespace Milch
         private GameObject compass = null;
         [SerializeField]
         private float transitionSpeed = 10.0f;
-        private RectTransform baseTransform = null;
+        private RectTransform compassransform = null;
         private string heading = "0";
         private float sourceAngle = 0.0f;
         private float targetAngle = 0.0f;
@@ -21,7 +20,7 @@ namespace Milch
         // Start is called before the first frame update
         void Start()
         {
-            this.baseTransform = this.compass.GetComponent<RectTransform>();
+            this.compassransform = this.compass.GetComponent<RectTransform>();
         }
 
         // Update is called once per frame
@@ -31,8 +30,8 @@ namespace Milch
 
             if (this.sourceAngle != this.targetAngle)
             {
-                float length = this.baseTransform.sizeDelta.x / 2;
-                float offset = this.baseTransform.sizeDelta.y / 2;
+                float length = this.compassransform.sizeDelta.x / 2;
+                float offset = this.compassransform.sizeDelta.y / 2;
                 float leftSideAngle;
                 float rightSideAngle;
 
@@ -73,11 +72,11 @@ namespace Milch
 
                 if (this.sourceAngle < 180)
                 {
-                    this.baseTransform.localPosition = new Vector3(length - offset - length - length / 360.0f * this.sourceAngle, this.baseTransform.localPosition.y, this.baseTransform.localPosition.z);
+                    this.compassransform.localPosition = new Vector3(length - offset - length - length / 360.0f * this.sourceAngle, this.compassransform.localPosition.y, this.compassransform.localPosition.z);
                 }
                 else
                 {
-                    this.baseTransform.localPosition = new Vector3(length - offset - length / 360.0f * this.sourceAngle, this.baseTransform.localPosition.y, this.baseTransform.localPosition.z);
+                    this.compassransform.localPosition = new Vector3(length - offset - length / 360.0f * this.sourceAngle, this.compassransform.localPosition.y, this.compassransform.localPosition.z);
                 }
             }
 
