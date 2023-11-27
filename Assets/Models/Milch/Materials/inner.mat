@@ -2,23 +2,31 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: inner
-  m_Shader: {fileID: 4800000, guid: 766736548846cdf459a9766614dcccab, type: 3}
-  m_ShaderKeywords: _ _EMISSIVE_SIMPLE _IS_ANGELRING_OFF _IS_TRANSCLIPPING_OFF _OUTLINE_NML
-    _SHADINGGRADEMAP
+  m_Shader: {fileID: 4800000, guid: 89a5842ca05ea4214a680a4ea3407b07, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords:
+  - _
+  - _EMISSIVE_SIMPLE
+  - _IS_ANGELRING_OFF
+  - _IS_TRANSCLIPPING_OFF
+  - _OUTLINE_NML
+  - _SHADINGGRADEMAP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2000
+  m_CustomRenderQueue: -1
   stringTagMap:
     IgnoreProjection: False
-    RenderType: Opaque
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -39,7 +47,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 13803fac90157a346996eab54f85d580, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -106,6 +114,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _OutlineZOffsetMaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Outline_Sampler:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -162,6 +174,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _1st2nd_Shades_Feather: 0.0001
     - _1st_ShadeColor_Feather: 0.01
@@ -172,6 +185,7 @@ Material:
     - _AR_OffsetU: 0
     - _AR_OffsetV: 0.3
     - _Add_Antipodean_RimLight: 0
+    - _AdditionalLightIgnoreCelShade: 0.9
     - _AlphaToMask: 0
     - _AngelRing: 0
     - _Ap_RimLight_FeatherOff: 0
@@ -186,6 +200,8 @@ Material:
     - _BumpScale: 1
     - _BumpScaleMatcap: 1
     - _CameraRolling_Stabilizer: 0
+    - _CelShadeMidPoint: -0.5
+    - _CelShadeSoftness: 0.05
     - _ClippingMode: 0
     - _Clipping_Level: 0
     - _ColorShift_Speed: 0
@@ -193,8 +209,10 @@ Material:
     - _Cutoff: 0.5
     - _DebugMode: 0
     - _DetailNormalMapScale: 1
+    - _DirectLightMultiplier: 1
     - _DstBlend: 0
     - _EMISSIVE: 0
+    - _EmissionMulByBaseColor: 0
     - _Farthest_Distance: 100
     - _GI_Intensity: 0.25
     - _GlossMapScale: 1
@@ -202,10 +220,12 @@ Material:
     - _GlossyReflections: 1
     - _HighColor_Power: 0
     - _IndirectLightIntensity: 0.1
+    - _IndirectLightMultiplier: 1
     - _Inverse_Clipping: 0
     - _Inverse_MatcapMask: 0
     - _Inverse_Z_Axis_BLD: 1
     - _IsBaseMapAlphaAsClippingMask: 0
+    - _IsFace: 0
     - _Is_BLD: 0
     - _Is_BakedNormal: 0
     - _Is_BlendAddToHiColor: 0
@@ -238,11 +258,14 @@ Material:
     - _LightColorAttenuation: 0
     - _LightDirection_MaskOn: 0
     - _MToonVersion: 32
+    - _MainLightIgnoreCelShade: 0
     - _MatCap: 0
     - _Metallic: 0
     - _Mode: 0
     - _Nearest_Distance: 0.5
     - _OUTLINE: 0
+    - _OcclusionRemapEnd: 1
+    - _OcclusionRemapStart: 0
     - _OcclusionStrength: 1
     - _Offset_X_Axis_BLD: -0.05
     - _Offset_Y_Axis_BLD: 0.09
@@ -251,10 +274,15 @@ Material:
     - _OutlineCullMode: 1
     - _OutlineLightingMix: 1
     - _OutlineScaledMaxDistance: 1
-    - _OutlineWidth: 0.5
+    - _OutlineWidth: 0
     - _OutlineWidthMode: 0
+    - _OutlineZOffset: 0.0001
+    - _OutlineZOffsetMaskRemapEnd: 1
+    - _OutlineZOffsetMaskRemapStart: 0
     - _Outline_Width: 0
     - _Parallax: 0.02
+    - _ReceiveShadowMappingAmount: 0.65
+    - _ReceiveShadowMappingPosOffset: 0
     - _ReceiveShadowRate: 1
     - _RimFresnelPower: 0
     - _RimLift: 0
@@ -297,6 +325,9 @@ Material:
     - _Tweak_transparency: 0
     - _UVSec: 0
     - _Unlit_Intensity: 1
+    - _UseAlphaClipping: 0
+    - _UseEmission: 0
+    - _UseOcclusion: 0
     - _Use_1stAs2nd: 0
     - _Use_BaseAs1st: 0
     - _UvAnimRotation: 0
@@ -320,12 +351,17 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _ColorShift: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
+    - _EmissionMapChannelMask: {r: 1, g: 1, b: 1, a: 0}
     - _Emissive_Color: {r: 0.0627451, g: 0.0627451, b: 0.0627451, a: 1}
     - _HighColor: {r: 0, g: 0, b: 0, a: 1}
+    - _IndirectLightMinColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
     - _MatCapColor: {r: 1, g: 1, b: 1, a: 1}
+    - _OcclusionMapChannelMask: {r: 1, g: 0, b: 0, a: 0}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _Outline_Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _RimColor: {r: 0, g: 0, b: 0, a: 1}
     - _RimLightColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadeColor: {r: 1, g: 0.6509804, b: 0.73333335, a: 1}
+    - _ShadowMapColor: {r: 1, g: 0.825, b: 0.78, a: 1}
     - _ViewShift: {r: 0, g: 0, b: 0, a: 1}
+  m_BuildTextureStacks: []
