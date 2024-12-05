@@ -210,16 +210,16 @@ namespace Milch
 
                     if (magnitude > 0.0f)
                     {
-                        this.rg.velocity = moveForward.normalized * this.maxMovementSpeed * magnitude;
+                        this.rg.linearVelocity = moveForward.normalized * this.maxMovementSpeed * magnitude;
                     }
 
                     this.animator.SetFloat("Speed", magnitude);
                 }
             }
 
-            if (this.rg.velocity.magnitude > this.walkingSpeed)
+            if (this.rg.linearVelocity.magnitude > this.walkingSpeed)
             {
-                var to = (Mathf.Min(this.rg.velocity.magnitude, this.maxMovementSpeed) - this.walkingSpeed) / (this.maxMovementSpeed - this.walkingSpeed) * (this.maxFieldOfView - this.minFieldOfView) + this.minFieldOfView;
+                var to = (Mathf.Min(this.rg.linearVelocity.magnitude, this.maxMovementSpeed) - this.walkingSpeed) / (this.maxMovementSpeed - this.walkingSpeed) * (this.maxFieldOfView - this.minFieldOfView) + this.minFieldOfView;
 
                 if (to - this.followCamera.fieldOfView < float.Epsilon)
                 {
