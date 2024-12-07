@@ -46,7 +46,7 @@ namespace Milch
         [SerializeField]
         private float maxPitch = 45;
         private Animator animator = null;
-        private Rigidbody rg = null;
+        private Rigidbody rb = null;
         private GameObject characterHips = null;
         private SkinnedMeshRenderer faceSkinnedMeshRenderer = null;
         private bool isGrounded = true;
@@ -75,6 +75,8 @@ namespace Milch
         private string modelHipsName = "hips";
         private string modelFaceName = "face";
         private string modelEyesBlendShapeName = "eyes_close";
+        private Vector3 velocity = Vector3.zero;
+        private bool jumpRequired = false;
 
         public float LookSensitivity
         {
@@ -107,7 +109,7 @@ namespace Milch
             this.sourceCameraOffsetY = this.targetCameraOffsetY = this.cameraNeutralOffsetY;
             this.sourceCameraOffsetZ = this.targetCameraOffsetZ = this.cameraNeutralOffsetZ;
             this.animator = this.model.GetComponent<Animator>();
-            this.rg = this.model.GetComponent<Rigidbody>();
+            this.rb = this.GetComponent<Rigidbody>();
             this.characterHips = this.model.transform.Find(this.modelRootName).Find(this.modelHipsName).gameObject;
             this.faceSkinnedMeshRenderer = this.model.transform.Find(this.modelFaceName).gameObject.GetComponent<SkinnedMeshRenderer>();
             this.model.transform.rotation = Quaternion.Euler(0.0f, 180.0f, 0.0f);
@@ -117,6 +119,19 @@ namespace Milch
 
         void FixedUpdate()
         {
+            if (this.jumpRequired)
+            {
+                this.rb.AddForce(this.model.transform.up * this.rb.mass * Mathf.Sqrt(2.0f * -Physics.gravity.y * this.jumpHeight), ForceMode.Impulse);
+                this.jumpRequired = false;
+            }
+
+            this.rb.linearVelocity = new Vector3(this.velocity.x, this.rb.linearVelocity.y, this.velocity.z);
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            var limit = this.viewingAngle / 2.0f;
             var maxInput = Mathf.Exp(1.0f) - 1.0f;
             var horizontalInput = Input.GetAxisRaw("Horizontal");
             var verticalInput = Input.GetAxisRaw("Vertical");
@@ -156,10 +171,10 @@ namespace Milch
                 this.isCloseup = false;
             }
 
-            this.sourcePitch = Mathf.SmoothStep(this.sourcePitch, this.targetPitch, Time.fixedDeltaTime * this.transitionSpeed);
-            this.sourceYaw = Mathf.SmoothStep(this.sourceYaw, this.targetYaw, Time.fixedDeltaTime * this.transitionSpeed);
-            this.sourceCameraOffsetY = Mathf.SmoothStep(this.sourceCameraOffsetY, this.targetCameraOffsetY, Time.fixedDeltaTime * this.transitionSpeed);
-            this.sourceCameraOffsetZ = Mathf.SmoothStep(this.sourceCameraOffsetZ, this.targetCameraOffsetZ, Time.fixedDeltaTime * this.transitionSpeed);
+            this.sourcePitch = Mathf.SmoothStep(this.sourcePitch, this.targetPitch, Time.deltaTime * this.transitionSpeed);
+            this.sourceYaw = Mathf.SmoothStep(this.sourceYaw, this.targetYaw, Time.deltaTime * this.transitionSpeed);
+            this.sourceCameraOffsetY = Mathf.SmoothStep(this.sourceCameraOffsetY, this.targetCameraOffsetY, Time.deltaTime * this.transitionSpeed);
+            this.sourceCameraOffsetZ = Mathf.SmoothStep(this.sourceCameraOffsetZ, this.targetCameraOffsetZ, Time.deltaTime * this.transitionSpeed);
 
             if (this.sourceCameraOffsetZ != this.targetCameraOffsetY || this.sourceCameraOffsetZ != this.targetCameraOffsetZ || this.sourceCameraOffsetZ != this.targetCameraOffsetY || this.sourceCameraOffsetZ != this.targetCameraOffsetZ)
             {
@@ -171,10 +186,10 @@ namespace Milch
                     this.sourceCameraOffsetZ = this.targetCameraOffsetZ;
                 }
 
-                this.followCamera.transform.position = new Vector3(this.model.transform.position.x, this.model.transform.position.y + this.sourceCameraOffsetY, this.model.transform.position.z + this.sourceCameraOffsetZ);
-                this.followCamera.transform.RotateAround(this.model.transform.position + Vector3.up * this.sourceCameraOffsetY, Vector3.right, this.sourcePitch);
-                this.followCamera.transform.RotateAround(this.model.transform.position + Vector3.up * this.sourceCameraOffsetY, Vector3.up, this.sourceYaw);
-                this.followCamera.transform.LookAt(this.model.transform.position + Vector3.up * this.sourceCameraOffsetY);
+                this.followCamera.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + this.sourceCameraOffsetY, this.transform.position.z + this.sourceCameraOffsetZ);
+                this.followCamera.transform.RotateAround(this.transform.position + Vector3.up * this.sourceCameraOffsetY, Vector3.right, this.sourcePitch);
+                this.followCamera.transform.RotateAround(this.transform.position + Vector3.up * this.sourceCameraOffsetY, Vector3.up, this.sourceYaw);
+                this.followCamera.transform.LookAt(this.transform.position + Vector3.up * this.sourceCameraOffsetY);
             }
 
             if (this.isCloseup)
@@ -183,7 +198,7 @@ namespace Milch
 
                 moveForward = cameraForward * verticalInput + this.followCamera.transform.right * horizontalInput;
 
-                this.model.transform.rotation = Quaternion.Slerp(this.model.transform.rotation, Quaternion.LookRotation(cameraForward), Time.fixedDeltaTime * this.transitionSpeed);
+                this.model.transform.rotation = Quaternion.Slerp(this.model.transform.rotation, Quaternion.LookRotation(cameraForward), Time.deltaTime * this.transitionSpeed);
             }
             else
             {
@@ -193,7 +208,7 @@ namespace Milch
 
                 if (moveForward != Vector3.zero)
                 {
-                    this.model.transform.rotation = Quaternion.Slerp(this.model.transform.rotation, Quaternion.LookRotation(moveForward), Time.fixedDeltaTime * this.transitionSpeed);
+                    this.model.transform.rotation = Quaternion.Slerp(this.model.transform.rotation, Quaternion.LookRotation(moveForward), Time.deltaTime * this.transitionSpeed);
                 }
             }
 
@@ -201,7 +216,7 @@ namespace Milch
             {
                 if (Input.GetButton("Jump") && !this.animator.GetBool("IsJumping") && !this.animator.GetCurrentAnimatorStateInfo(0).IsName("Jump"))
                 {
-                    this.rg.AddForce(this.model.transform.up * this.rg.mass * Mathf.Sqrt(2.0f * -Physics.gravity.y * this.jumpHeight), ForceMode.Impulse);
+                    this.jumpRequired = true;
                     this.animator.SetBool("IsJumping", true);
                 }
                 else
@@ -210,16 +225,20 @@ namespace Milch
 
                     if (magnitude > 0.0f)
                     {
-                        this.rg.linearVelocity = moveForward.normalized * this.maxMovementSpeed * magnitude;
+                        this.velocity = moveForward.normalized * this.maxMovementSpeed * magnitude;
+                    }
+                    else
+                    {
+                        this.velocity = Vector3.zero;
                     }
 
                     this.animator.SetFloat("Speed", magnitude);
                 }
             }
 
-            if (this.rg.linearVelocity.magnitude > this.walkingSpeed)
+            if (this.rb.linearVelocity.magnitude > this.walkingSpeed)
             {
-                var to = (Mathf.Min(this.rg.linearVelocity.magnitude, this.maxMovementSpeed) - this.walkingSpeed) / (this.maxMovementSpeed - this.walkingSpeed) * (this.maxFieldOfView - this.minFieldOfView) + this.minFieldOfView;
+                var to = (Mathf.Min(this.rb.linearVelocity.magnitude, this.maxMovementSpeed) - this.walkingSpeed) / (this.maxMovementSpeed - this.walkingSpeed) * (this.maxFieldOfView - this.minFieldOfView) + this.minFieldOfView;
 
                 if (to - this.followCamera.fieldOfView < float.Epsilon)
                 {
@@ -227,7 +246,7 @@ namespace Milch
                 }
                 else
                 {
-                    this.followCamera.fieldOfView = Mathf.SmoothStep(this.followCamera.fieldOfView, to, Time.fixedDeltaTime * this.dynamicFieldOfViewSpeed);
+                    this.followCamera.fieldOfView = Mathf.SmoothStep(this.followCamera.fieldOfView, to, Time.deltaTime * this.dynamicFieldOfViewSpeed);
                 }
             }
             else if (this.followCamera.fieldOfView - this.minFieldOfView < float.Epsilon)
@@ -236,14 +255,8 @@ namespace Milch
             }
             else
             {
-                this.followCamera.fieldOfView = Mathf.SmoothStep(this.followCamera.fieldOfView, this.minFieldOfView, Time.fixedDeltaTime * this.dynamicFieldOfViewSpeed);
+                this.followCamera.fieldOfView = Mathf.SmoothStep(this.followCamera.fieldOfView, this.minFieldOfView, Time.deltaTime * this.dynamicFieldOfViewSpeed);
             }
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            var limit = this.viewingAngle / 2.0f;
 
             for (int i = 0; i < this.eyeTransforms.Length; i++)
             {
