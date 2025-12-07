@@ -214,7 +214,18 @@ namespace Milch
 
             if (this.isGrounded)
             {
-                if (Input.GetButton("Jump") && !this.animator.GetBool("IsJumping") && !this.animator.GetCurrentAnimatorStateInfo(0).IsName("Jump"))
+                if (Input.GetKeyUp(KeyCode.Return))
+                {
+                    if (this.animator.GetBool("IsDance"))
+                    {
+                        this.animator.SetBool("IsDance", false);
+                    }
+                    else
+                    {
+                        this.animator.SetBool("IsDance", true);
+                    }
+                }
+                else if (Input.GetButton("Jump") && !this.animator.GetBool("IsJumping") && !this.animator.GetCurrentAnimatorStateInfo(0).IsName("Jump"))
                 {
                     this.jumpRequired = true;
                     this.animator.SetBool("IsJumping", true);
